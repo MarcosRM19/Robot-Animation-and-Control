@@ -1,4 +1,4 @@
-Primero lo que tenemos que entender es que el robot se divide en X estados diferentes los cuales son:
+Primero lo que tenemos que entender es que el robot se divide en 6 estados diferentes los cuales son:
 
 	1.Caminando hacia el target: Este se compone de diferentes estados también ya que antes de llegar al objetivo hay una pared que 
 	rodea, lo que se hace en este caso es moverse teniendo en cuanta la clásica formula de movimiento de física la cual X = X + V * t
