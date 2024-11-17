@@ -456,7 +456,7 @@ MonoBehaviour:
   currentWalkState: 0
   grabTime: 0
   robotGrabSpeed: 1
-  robotWalkSpeed: 4
+  robotWalkSpeed: 8
   targetDistance: 0.75
   dropDistance: 1.25
   walkingTargetDistance: 3.7
@@ -466,6 +466,7 @@ MonoBehaviour:
   joint2Amplitude: -50
   endJointAmplitudeGrab: -100
   endJointAmplitudeDrop: -93
+  endJointAmplitudeDropHorizontal: 132
   firstLerpDistance: 0
   secondLerpDistance: 0
   thirdLerpDistance: 0

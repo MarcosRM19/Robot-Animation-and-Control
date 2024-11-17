@@ -45,6 +45,7 @@ public class MyRobotController : MonoBehaviour
     public float joint2Amplitude;
     public float endJointAmplitudeGrab;
     public float endJointAmplitudeDrop;
+    public float endJointAmplitudeDropHorizontal;
 
     private Quaternion initJoint1Rotation;
     private Quaternion initJoint2Rotation;
@@ -52,6 +53,7 @@ public class MyRobotController : MonoBehaviour
     float joint1Rotation;
     float joint2Rotation;
     float endJointRotation;
+    float endJointRotationY;
 
     [Header("Rotation")]
     public float firstLerpDistance;
@@ -91,11 +93,11 @@ public class MyRobotController : MonoBehaviour
 
     private void Update()
     {
-        PickStudAnim();
+        PickStudAnimVertical();
         UpdateVisualLinks();
     }
 
-    private void PickStudAnim()
+    private void PickStudAnimVertical()
     {
         switch(currentState) 
         { 
@@ -124,10 +126,6 @@ public class MyRobotController : MonoBehaviour
 
     private void WalkingToTarget()
     {
-        transform.position = new Vector3(transform.position.x + (robotWalkSpeed * Mathf.Sin(transform.eulerAngles.y * Mathf.Deg2Rad) * Time.deltaTime),
-            transform.position.y,
-            transform.position.z + (robotWalkSpeed * Mathf.Cos(transform.eulerAngles.y * Mathf.Deg2Rad) * Time.deltaTime));
-
        switch(currentWalkState)
        {
             case WalkingState.WALKINGFORWARDBEFOREWALL:
@@ -171,6 +169,11 @@ public class MyRobotController : MonoBehaviour
             case WalkingState.WALKINGFORWARDAFTERWALL:
                 break;
         }
+
+        transform.position = new Vector3(transform.position.x + (robotWalkSpeed * Mathf.Sin(transform.eulerAngles.y * Mathf.Deg2Rad) * Time.deltaTime),
+    transform.position.y,
+    transform.position.z + (robotWalkSpeed * Mathf.Cos(transform.eulerAngles.y * Mathf.Deg2Rad) * Time.deltaTime));
+
         if (Vector3.Distance(transform.position, Stud_target.position) < walkingTargetDistance)
             currentState = RobotState.GRABBINGTARGET;
     }
@@ -202,15 +205,30 @@ public class MyRobotController : MonoBehaviour
     {
         grabTime += Time.deltaTime * robotGrabSpeed;
 
-        CalculateRotation(endJointAmplitudeDrop);
-        CalculateJointRotation();
+        joint1Rotation = Mathf.Sin(grabTime) * joint1Amplitude;
+        joint2Rotation = Mathf.Sin(-(grabTime + Mathf.PI / 4)) * joint2Amplitude;
+        endJointRotation = Mathf.Sin(-(grabTime + Mathf.PI / 2)) * endJointAmplitudeDrop;
+        endJointRotationY = Mathf.Sin(grabTime) * endJointAmplitudeDropHorizontal;
 
+        joint1.localRotation = Quaternion.Euler(joint1Rotation, 0, 0);
+        joint2.localRotation = Quaternion.Euler(joint2Rotation, 0, 0);
+        endJoint.localRotation = Quaternion.Euler(endJointRotation, endJointRotationY, 0);
+
+        RestrictRotationToZ(Stud_target);
 
         if (Vector3.Distance(Stud_target.position, Workbench_destination.position) < dropDistance)
         {
             currentState = RobotState.RECOMPOSITEARMDROPPING;
             Stud_target.SetParent(null);
         }
+    }
+
+    private void RestrictRotationToZ(Transform target)
+    {
+        Vector3 targetEulerAngles = target.eulerAngles;
+
+        // Mantén X e Y en 0, conserva Z como está
+        target.rotation = Quaternion.Euler(0, 0, targetEulerAngles.z);
     }
 
     private void RecompositeArmTarget()
